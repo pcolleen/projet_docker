@@ -15,7 +15,7 @@ export default function App() {
   }
 
   if (token) return <Home onLogout={handleLogout} />
-  if (page === 'register') return <Register onBack={() => setPage('login')} />
+  if (page === 'register') return <Register onSuccess={handleLogin} onBack={() => setPage('login')} />
   return <Login onSuccess={handleLogin} onRegister={() => setPage('register')} />
 }
 
@@ -62,11 +62,10 @@ function Login({ onSuccess, onRegister }) {
   )
 }
 
-function Register({ onBack }) {
+function Register({ onSuccess, onBack }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
   async function submit(e) {
@@ -81,8 +80,15 @@ function Register({ onBack }) {
       })
       const data = await res.json()
       if (!res.ok) return setError(data.error)
-      setSuccess(true)
-      setTimeout(onBack, 1500)
+
+      const loginRes = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const loginData = await loginRes.json()
+      if (!loginRes.ok) return setError(loginData.error)
+      onSuccess(loginData.token)
     } catch {
       setError('Impossible de contacter le serveur')
     } finally {
@@ -95,7 +101,6 @@ function Register({ onBack }) {
       <form style={s.card} onSubmit={submit}>
         <h2 style={s.title}>Inscription</h2>
         {error && <p style={s.error}>{error}</p>}
-        {success && <p style={s.success}>Compte créé ! Redirection...</p>}
         <input style={s.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
         <input style={s.input} type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} required />
         <button style={s.btn} type="submit" disabled={loading}>{loading ? 'Création...' : 'Créer un compte'}</button>

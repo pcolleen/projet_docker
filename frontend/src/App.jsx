@@ -132,11 +132,25 @@ function Home({ onLogout }) {
     setTodos(todos.filter(t => t.id !== id))
   }
 
+  function clearDone() {
+    setTodos(todos.filter(t => !t.done))
+  }
+
+  const remaining = todos.filter(t => !t.done).length
+  const hasDone = todos.some(t => t.done)
+
   return (
     <div style={s.page}>
-      <div style={{ ...s.card, maxWidth: '480px' }}>
+      <div style={{ ...s.card, maxWidth: '500px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={s.title}>Ma To-Do List</h2>
+          <div>
+            <h2 style={s.title}>Ma To-Do List</h2>
+            {todos.length > 0 && (
+              <p style={{ color: '#888', fontSize: '0.85rem', marginTop: '0.2rem' }}>
+                {remaining} tâche{remaining !== 1 ? 's' : ''} restante{remaining !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
           <button style={{ ...s.btn, background: '#e74c3c', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={onLogout}>
             Déconnexion
           </button>
@@ -149,24 +163,30 @@ function Home({ onLogout }) {
             value={input}
             onChange={e => setInput(e.target.value)}
           />
-          <button style={{ ...s.btn, padding: '0.75rem 1rem' }} type="submit">+</button>
+          <button style={{ ...s.btn, padding: '0.75rem 1.2rem', fontSize: '1.2rem' }} type="submit">+</button>
         </form>
 
         {todos.length === 0 && (
-          <p style={{ color: '#aaa', textAlign: 'center' }}>Aucune tâche pour le moment</p>
+          <p style={{ color: '#bbb', textAlign: 'center', padding: '1rem 0' }}>Aucune tâche pour le moment</p>
         )}
 
-        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
           {todos.map(t => (
-            <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem', background: '#f8f8f8', borderRadius: '4px' }}>
-              <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
+            <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem', background: t.done ? '#f9f9f9' : '#fff', border: '1px solid #eee', borderRadius: '6px', transition: 'opacity 0.2s', opacity: t.done ? 0.6 : 1 }}>
+              <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#3498db' }} />
               <span style={{ flex: 1, textDecoration: t.done ? 'line-through' : 'none', color: t.done ? '#aaa' : '#333' }}>
                 {t.text}
               </span>
-              <button onClick={() => remove(t.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+              <button onClick={() => remove(t.id)} style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}>✕</button>
             </li>
           ))}
         </ul>
+
+        {hasDone && (
+          <button onClick={clearDone} style={{ background: 'none', border: '1px solid #ddd', color: '#888', borderRadius: '4px', padding: '0.4rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+            Supprimer les tâches terminées
+          </button>
+        )}
       </div>
     </div>
   )

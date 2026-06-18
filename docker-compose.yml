@@ -7,6 +7,7 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -29,3 +30,6 @@ services:
       - "80:80"
     depends_on:
       - backend
+
+volumes:
+  postgres_data:

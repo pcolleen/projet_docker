@@ -114,14 +114,59 @@ function Register({ onSuccess, onBack }) {
 }
 
 function Home({ onLogout }) {
+  const [todos, setTodos] = useState([])
+  const [input, setInput] = useState('')
+
+  function add(e) {
+    e.preventDefault()
+    if (!input.trim()) return
+    setTodos([...todos, { id: Date.now(), text: input.trim(), done: false }])
+    setInput('')
+  }
+
+  function toggle(id) {
+    setTodos(todos.map(t => t.id === id ? { ...t, done: !t.done } : t))
+  }
+
+  function remove(id) {
+    setTodos(todos.filter(t => t.id !== id))
+  }
+
   return (
     <div style={s.page}>
-      <div style={s.card}>
-        <h2 style={s.title}>Bienvenue !</h2>
-        <p style={{ color: '#555', marginBottom: '1.5rem' }}>Vous êtes connecté.</p>
-        <button style={{ ...s.btn, background: '#e74c3c' }} onClick={onLogout}>
-          Se déconnecter
-        </button>
+      <div style={{ ...s.card, maxWidth: '480px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={s.title}>Ma To-Do List</h2>
+          <button style={{ ...s.btn, background: '#e74c3c', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={onLogout}>
+            Déconnexion
+          </button>
+        </div>
+
+        <form style={{ display: 'flex', gap: '0.5rem' }} onSubmit={add}>
+          <input
+            style={{ ...s.input, flex: 1 }}
+            placeholder="Ajouter une tâche..."
+            value={input}
+            onChange={e => setInput(e.target.value)}
+          />
+          <button style={{ ...s.btn, padding: '0.75rem 1rem' }} type="submit">+</button>
+        </form>
+
+        {todos.length === 0 && (
+          <p style={{ color: '#aaa', textAlign: 'center' }}>Aucune tâche pour le moment</p>
+        )}
+
+        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {todos.map(t => (
+            <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem', background: '#f8f8f8', borderRadius: '4px' }}>
+              <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
+              <span style={{ flex: 1, textDecoration: t.done ? 'line-through' : 'none', color: t.done ? '#aaa' : '#333' }}>
+                {t.text}
+              </span>
+              <button onClick={() => remove(t.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )

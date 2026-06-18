@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL
+);
+
+-- mot de passe : "password123"
+INSERT INTO users (email, password) VALUES
+  ('test@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+
 CREATE TABLE IF NOT EXISTS items (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,

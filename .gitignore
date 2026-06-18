@@ -1,0 +1,8 @@
+# Dépendances
+node_modules/
+
+# Build React
+frontend/dist/
+
+# Variables d'environnement
+.env

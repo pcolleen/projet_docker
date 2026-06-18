@@ -22,3 +22,10 @@ services:
       DB_NAME: mydb
     depends_on:
       - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

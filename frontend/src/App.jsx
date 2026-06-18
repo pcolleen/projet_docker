@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function App() {
   const [page, setPage] = useState('login')
@@ -14,7 +14,7 @@ export default function App() {
     setToken(null)
   }
 
-  if (token) return <Home onLogout={handleLogout} />
+  if (token) return <Home token={token} onLogout={handleLogout} />
   if (page === 'register') return <Register onSuccess={handleLogin} onBack={() => setPage('login')} />
   return <Login onSuccess={handleLogin} onRegister={() => setPage('register')} />
 }
@@ -113,26 +113,42 @@ function Register({ onSuccess, onBack }) {
   )
 }
 
-function Home({ onLogout }) {
+function Home({ token, onLogout }) {
   const [todos, setTodos] = useState([])
   const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  function add(e) {
+  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+
+  useEffect(() => {
+    fetch('/todos', { headers })
+      .then(r => r.json())
+      .then(data => { setTodos(data); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  async function add(e) {
     e.preventDefault()
     if (!input.trim()) return
-    setTodos([...todos, { id: Date.now(), text: input.trim(), done: false }])
+    const res = await fetch('/todos', { method: 'POST', headers, body: JSON.stringify({ text: input.trim() }) })
+    const todo = await res.json()
+    setTodos([...todos, todo])
     setInput('')
   }
 
-  function toggle(id) {
-    setTodos(todos.map(t => t.id === id ? { ...t, done: !t.done } : t))
+  async function toggle(id) {
+    const res = await fetch(`/todos/${id}`, { method: 'PATCH', headers })
+    const updated = await res.json()
+    setTodos(todos.map(t => t.id === id ? updated : t))
   }
 
-  function remove(id) {
+  async function remove(id) {
+    await fetch(`/todos/${id}`, { method: 'DELETE', headers })
     setTodos(todos.filter(t => t.id !== id))
   }
 
-  function clearDone() {
+  async function clearDone() {
+    await fetch('/todos/done', { method: 'DELETE', headers })
     setTodos(todos.filter(t => !t.done))
   }
 
@@ -166,13 +182,14 @@ function Home({ onLogout }) {
           <button style={{ ...s.btn, padding: '0.75rem 1.2rem', fontSize: '1.2rem' }} type="submit">+</button>
         </form>
 
-        {todos.length === 0 && (
+        {loading && <p style={{ color: '#bbb', textAlign: 'center' }}>Chargement...</p>}
+        {!loading && todos.length === 0 && (
           <p style={{ color: '#bbb', textAlign: 'center', padding: '1rem 0' }}>Aucune tâche pour le moment</p>
         )}
 
         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
           {todos.map(t => (
-            <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem', background: t.done ? '#f9f9f9' : '#fff', border: '1px solid #eee', borderRadius: '6px', transition: 'opacity 0.2s', opacity: t.done ? 0.6 : 1 }}>
+            <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem', background: t.done ? '#f9f9f9' : '#fff', border: '1px solid #eee', borderRadius: '6px', opacity: t.done ? 0.6 : 1 }}>
               <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#3498db' }} />
               <span style={{ flex: 1, textDecoration: t.done ? 'line-through' : 'none', color: t.done ? '#aaa' : '#333' }}>
                 {t.text}

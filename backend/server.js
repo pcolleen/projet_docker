@@ -3,6 +3,7 @@ const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const authRouter = require('./routes/auth');
+const todosRouter = require('./routes/todos');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/auth', authRouter);
+app.use('/todos', todosRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

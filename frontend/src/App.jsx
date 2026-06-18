@@ -23,18 +23,26 @@ function Login({ onSuccess, onRegister }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function submit(e) {
     e.preventDefault()
     setError('')
-    const res = await fetch('/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-    const data = await res.json()
-    if (!res.ok) return setError(data.error)
-    onSuccess(data.token)
+    setLoading(true)
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) return setError(data.error)
+      onSuccess(data.token)
+    } catch {
+      setError('Impossible de contacter le serveur')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -44,7 +52,7 @@ function Login({ onSuccess, onRegister }) {
         {error && <p style={s.error}>{error}</p>}
         <input style={s.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
         <input style={s.input} type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} required />
-        <button style={s.btn} type="submit">Se connecter</button>
+        <button style={s.btn} type="submit" disabled={loading}>{loading ? 'Connexion...' : 'Se connecter'}</button>
         <p style={s.link}>
           Pas de compte ?{' '}
           <span style={s.a} onClick={onRegister}>S'inscrire</span>
@@ -59,19 +67,27 @@ function Register({ onBack }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   async function submit(e) {
     e.preventDefault()
     setError('')
-    const res = await fetch('/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-    const data = await res.json()
-    if (!res.ok) return setError(data.error)
-    setSuccess(true)
-    setTimeout(onBack, 1500)
+    setLoading(true)
+    try {
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) return setError(data.error)
+      setSuccess(true)
+      setTimeout(onBack, 1500)
+    } catch {
+      setError('Impossible de contacter le serveur')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -82,7 +98,7 @@ function Register({ onBack }) {
         {success && <p style={s.success}>Compte créé ! Redirection...</p>}
         <input style={s.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
         <input style={s.input} type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} required />
-        <button style={s.btn} type="submit">Créer un compte</button>
+        <button style={s.btn} type="submit" disabled={loading}>{loading ? 'Création...' : 'Créer un compte'}</button>
         <p style={s.link}>
           Déjà un compte ?{' '}
           <span style={s.a} onClick={onBack}>Se connecter</span>

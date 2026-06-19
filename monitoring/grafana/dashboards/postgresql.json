@@ -1,0 +1,209 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "panels": [
+
+    { "id": 1, "type": "stat", "title": "Connexions actives",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 15 }, { "color": "red", "value": 18 }] },
+          "mappings": []
+        }, "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(pg_stat_activity_count{state=\"active\"})", "refId": "A" }]
+    },
+
+    { "id": 2, "type": "stat", "title": "Taille de la base (mydb)",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "mappings": []
+        }, "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_database_size_bytes{datname=\"mydb\"}", "refId": "A" }]
+    },
+
+    { "id": 3, "type": "stat", "title": "Cache Hit Ratio (%)",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 90 }, { "color": "green", "value": 99 }] },
+          "mappings": []
+        }, "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "100 * sum(pg_stat_database_blks_hit{datname=\"mydb\"}) / (sum(pg_stat_database_blks_hit{datname=\"mydb\"}) + sum(pg_stat_database_blks_read{datname=\"mydb\"}) + 1)", "refId": "A" }]
+    },
+
+    { "id": 4, "type": "stat", "title": "Locks actifs",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 5 }, { "color": "red", "value": 10 }] },
+          "mappings": []
+        }, "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(pg_locks_count)", "refId": "A" }]
+    },
+
+    { "id": 10, "type": "row", "title": "Connexions", "collapsed": false,
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 1 }
+    },
+
+    { "id": 5, "type": "timeseries", "title": "Connexions par état",
+      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15, "showPoints": "never" },
+          "min": 0
+        }, "overrides": []
+      },
+      "options": {
+        "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_stat_activity_count{state=\"active\"}", "legendFormat": "active", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_stat_activity_count{state=\"idle\"}", "legendFormat": "idle", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_stat_activity_count{state=\"idle in transaction\"}", "legendFormat": "idle in transaction", "refId": "C" }
+      ]
+    },
+
+    { "id": 6, "type": "timeseries", "title": "Connexions max vs utilisées",
+      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10, "showPoints": "never" },
+          "min": 0
+        }, "overrides": []
+      },
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_settings_max_connections", "legendFormat": "max connexions", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(pg_stat_activity_count)", "legendFormat": "connexions utilisées", "refId": "B" }
+      ]
+    },
+
+    { "id": 11, "type": "row", "title": "Transactions & Cache", "collapsed": false,
+      "gridPos": { "x": 0, "y": 13, "w": 24, "h": 1 }
+    },
+
+    { "id": 7, "type": "timeseries", "title": "Transactions / s",
+      "gridPos": { "x": 0, "y": 14, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15, "showPoints": "never" },
+          "min": 0
+        }, "overrides": []
+      },
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_database_xact_commit_total{datname=\"mydb\"}[1m])", "legendFormat": "commits/s", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_database_xact_rollback_total{datname=\"mydb\"}[1m])", "legendFormat": "rollbacks/s", "refId": "B" }
+      ]
+    },
+
+    { "id": 8, "type": "timeseries", "title": "Cache Hit Ratio (%)",
+      "gridPos": { "x": 12, "y": 14, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15, "showPoints": "never" },
+          "min": 0, "max": 100
+        }, "overrides": []
+      },
+      "options": {
+        "legend": { "calcs": ["mean", "min"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "100 * rate(pg_stat_database_blks_hit{datname=\"mydb\"}[1m]) / (rate(pg_stat_database_blks_hit{datname=\"mydb\"}[1m]) + rate(pg_stat_database_blks_read{datname=\"mydb\"}[1m]) + 1)", "legendFormat": "hit ratio mydb", "refId": "A" }
+      ]
+    },
+
+    { "id": 12, "type": "row", "title": "Tables", "collapsed": false,
+      "gridPos": { "x": 0, "y": 22, "w": 24, "h": 1 }
+    },
+
+    { "id": 9, "type": "timeseries", "title": "Lignes lues / insérées / supprimées par table",
+      "gridPos": { "x": 0, "y": 23, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10, "showPoints": "never" },
+          "min": 0
+        }, "overrides": []
+      },
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_user_tables_seq_tup_read{schemaname=\"public\"}[1m])", "legendFormat": "seq read - {{relname}}", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_user_tables_n_tup_ins{schemaname=\"public\"}[1m])", "legendFormat": "inserts - {{relname}}", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(pg_stat_user_tables_n_tup_del{schemaname=\"public\"}[1m])", "legendFormat": "deletes - {{relname}}", "refId": "C" }
+      ]
+    },
+
+    { "id": 13, "type": "timeseries", "title": "Taille de la base dans le temps",
+      "gridPos": { "x": 12, "y": 23, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15, "showPoints": "never" },
+          "min": 0
+        }, "overrides": []
+      },
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "pg_database_size_bytes{datname=\"mydb\"}", "legendFormat": "mydb", "refId": "A" }
+      ]
+    }
+
+  ],
+  "refresh": "15s",
+  "schemaVersion": 36,
+  "tags": ["postgresql", "database"],
+  "time": { "from": "now-30m", "to": "now" },
+  "timezone": "browser",
+  "title": "PostgreSQL - Métriques",
+  "uid": "postgresql-metrics",
+  "version": 1
+}

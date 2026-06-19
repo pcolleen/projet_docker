@@ -4,7 +4,6 @@ const client = require('prom-client');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const authRouter = require('./routes/auth');
-const todosRouter = require('./routes/todos');
 const tasksRouter = require('./routes/tasks');
 
 const app = express();
@@ -29,7 +28,7 @@ app.use((req, res, next) => {
 const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
-    info: { title: 'API Todo App', version: '1.0.0' },
+    info: { title: 'API Kanban', version: '1.0.0' },
     components: {
       securitySchemes: {
         bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
@@ -48,7 +47,6 @@ app.get('/metrics', async (req, res) => {
 });
 
 app.use('/auth', authRouter);
-app.use('/todos', todosRouter);
 app.use('/tasks', tasksRouter);
 
 app.listen(PORT, () => {

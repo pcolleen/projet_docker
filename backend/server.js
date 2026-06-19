@@ -4,6 +4,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const authRouter = require('./routes/auth');
 const todosRouter = require('./routes/todos');
+const tasksRouter = require('./routes/tasks');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/auth', authRouter);
 app.use('/todos', todosRouter);
+app.use('/tasks', tasksRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
